@@ -1,0 +1,57 @@
+# -----------------------------
+# Carbon Footprint Dashboard Project
+# -----------------------------
+
+import pandas as pd
+import matplotlib.pyplot as plt
+
+# 1. Load Dataset
+file_path = "carbon_footprint_sample.csv"   # update path if needed
+df = pd.read_csv("C:/Users/user/Downloads/carbon_footprint_sample.csv")
+
+# 2. Inspect Data
+print("Sample Data:\n", df.head())
+
+# 3. Aggregate emissions
+emissions_by_scope = df.groupby(["Year", "Scope"])["Emissions_tCO2"].sum().reset_index()
+emissions_by_year = df.groupby("Year")["Emissions_tCO2"].sum().reset_index()
+emissions_by_location = df.groupby(["Year", "Location"])["Emissions_tCO2"].sum().reset_index()
+
+print("\nEmissions by Scope:\n", emissions_by_scope)
+print("\nEmissions by Year:\n", emissions_by_year)
+print("\nEmissions by Location:\n", emissions_by_location)
+
+# 4. Visualization
+
+# --- Bar chart: Emissions by Scope & Year ---
+plt.figure(figsize=(8,5))
+for year in emissions_by_scope["Year"].unique():
+    subset = emissions_by_scope[emissions_by_scope["Year"] == year]
+    plt.bar(subset["Scope"] + " (" + subset["Year"].astype(str) + ")", subset["Emissions_tCO2"], label=year)
+
+plt.title("Emissions by Scope and Year")
+plt.ylabel("Emissions (tCO2)")
+plt.xticks(rotation=45)
+plt.show()
+
+# --- Line chart: Total emissions by Year ---
+plt.figure(figsize=(7,5))
+plt.plot(emissions_by_year["Year"], emissions_by_year["Emissions_tCO2"], marker="o", linestyle="-")
+plt.title("Total Emissions Trend")
+plt.xlabel("Year")
+plt.ylabel("Emissions (tCO2)")
+plt.grid(True)
+plt.show()
+
+# --- Pie chart: Emissions share in latest year ---
+latest_year = df["Year"].max()
+subset = emissions_by_scope[emissions_by_scope["Year"] == latest_year]
+
+plt.figure(figsize=(6,6))
+plt.pie(subset["Emissions_tCO2"], labels=subset["Scope"], autopct='%1.1f%%', startangle=140)
+plt.title(f"Emissions Share by Scope - {latest_year}")
+plt.show()
+
+# -----------------------------
+# End of Project Code
+# -----------------------------
